@@ -1,0 +1,37 @@
+== tlsserver suite started 2026-10-14T12:39:12Z
+versions: certbot 2.9.0, certbot 5.8.0, acme.sh v3.1.6, lego version 5.5.2 linux/amd64
+Saving debug log to /srv/le/tlsserver-45/cb58/logs/letsencrypt.log
+This certificate expires on 2026-11-28.
+== acme.sh 3.1.6 planned renewals
+t316 notBefore=Oct 14 11:41:06 2026 GMT notAfter=Nov 28 11:41:05 2026 GMT next='2026-11-13T18:22:07Z' days=
+t316d60 notBefore=Oct 14 11:41:29 2026 GMT notAfter=Nov 28 11:41:28 2026 GMT next='2026-11-13T03:12:24Z' days='60'
+== lego decision (ARI, then ARI disabled)
+2026-10-14T12:40:13.180912272Z DEBUG RenewalInfo endpoint indicates that renewal is not needed. cert-name=tlego.46-101-102-127.sslip.io
+2026-10-14T12:40:13.181003378Z INFO  Skip renewal: The certificate expires at 2026-11-28T11:41:39Z, the renewal can be performed in 29d23h1m26s152344708ns. cert-name=tlego.46-101-102-127.sslip.io
+2026-10-14T12:40:13.225390837Z INFO  Skip renewal: The certificate expires at 2026-11-28T11:41:39Z, the renewal can be performed in 29d23h1m26s107970706ns. cert-name=tlego.46-101-102-127.sslip.io
+== ARI windows
+{"cert": "t58.46-101-102-127.sslip.io", "notBefore": "2026-10-14T11:40:51+00:00", "notAfter": "2026-11-28T11:40:50+00:00", "lifetime_days": 45.0, "ari_start": "2026-11-13T01:12:55+00:00", "ari_end": "2026-11-13T22:47:45+00:00", "ari_start_day": 29.56, "ari_end_day": 30.46, "ari_start_share": 0.657}
+{"cert": "tlego.46-101-102-127.sslip.io.crt", "notBefore": "2026-10-14T11:41:40+00:00", "notAfter": "2026-11-28T11:41:39+00:00", "lifetime_days": 45.0, "ari_start": "2026-11-13T01:13:44+00:00", "ari_end": "2026-11-13T22:48:34+00:00", "ari_start_day": 29.56, "ari_end_day": 30.46, "ari_start_share": 0.657}
+{"cert": "t316.46-101-102-127.sslip.io.cer", "notBefore": "2026-10-14T11:41:06+00:00", "notAfter": "2026-11-28T11:41:05+00:00", "lifetime_days": 45.0, "ari_start": "2026-11-13T01:13:11+00:00", "ari_end": "2026-11-13T22:48:01+00:00", "ari_start_day": 29.56, "ari_end_day": 30.46, "ari_start_share": 0.657}
+{"cert": "t316d60.46-101-102-127.sslip.io.cer", "notBefore": "2026-10-14T11:41:29+00:00", "notAfter": "2026-11-28T11:41:28+00:00", "lifetime_days": 45.0, "ari_start": "2026-11-13T01:13:33+00:00", "ari_end": "2026-11-13T22:48:22+00:00", "ari_start_day": 29.56, "ari_end_day": 30.46, "ari_start_share": 0.657}
+== certbot 5.8 probe (hours after notBefore)
+# certbot 5.8.0 t58.46-101-102-127.sslip.io notBefore=Oct 14 11:40:51 2026 GMT notAfter=Nov 28 11:40:50 2026 GMT
+hour 700 (day 29.17, 2026-11-12 15:40:51 UTC): not due
+hour 709 (day 29.54, 2026-11-13 00:40:51 UTC): not due
+hour 715 (day 29.79, 2026-11-13 06:40:51 UTC): not due
+hour 718 (day 29.92, 2026-11-13 09:40:51 UTC): not due
+hour 721 (day 30.04, 2026-11-13 12:40:51 UTC): not due
+hour 724 (day 30.17, 2026-11-13 15:40:51 UTC): not due
+hour 727 (day 30.29, 2026-11-13 18:40:51 UTC): RENEWED
+hour 730 (day 30.42, 2026-11-13 21:40:51 UTC): not due
+hour 733 (day 30.54, 2026-11-14 00:40:51 UTC): RENEWED
+hour 740 (day 30.83, 2026-11-14 07:40:51 UTC): RENEWED
+== certbot 2.9 probe on a copy of the same 45-day lineage
+# certbot 2.9.0 t58.46-101-102-127.sslip.io notBefore=Oct 14 11:40:51 2026 GMT notAfter=Nov 28 11:40:50 2026 GMT
+hour 340 (day 14.17, 2026-10-28 15:40:51 UTC): not due
+hour 355 (day 14.79, 2026-10-29 06:40:51 UTC): not due
+hour 359 (day 14.96, 2026-10-29 10:40:51 UTC): not due
+hour 362 (day 15.08, 2026-10-29 13:40:51 UTC): RENEWED
+hour 365 (day 15.21, 2026-10-29 16:40:51 UTC): RENEWED
+hour 380 (day 15.83, 2026-10-30 07:40:51 UTC): RENEWED
+== tlsserver suite done 2026-10-14T12:40:59Z

@@ -1,0 +1,37 @@
+== acme.sh 3.0.7: next renewal = issue time + days - 1 day, no cap at expiry (acme.sh lines 5292-5293)
+70:DEFAULT_RENEW=60
+  else
+    Le_NextRenewTime=$(_math "$Le_CertCreateTime" + "$Le_RenewalDays" \* 24 \* 60 \* 60)
+    Le_NextRenewTime=$(_math "$Le_NextRenewTime" - 86400)
+    Le_NextRenewTimeStr=$(_time2str "$Le_NextRenewTime")
+
+== acme.sh 3.1.6: default days 30, capped one day before expiry, then ARI (lines 69, 2053-2071, 6436-6439)
+DEFAULT_RENEW="${DEFAULT_RENEW:-30}"
+_calc_next_renew_time() {
+  _cnrt_create="$1"
+  _cnrt_days="$2"
+  _cnrt_end="$3"
+  _cnrt_next=$(_math "$_cnrt_create" + "$_cnrt_days" \* 24 \* 60 \* 60 - 86400)
+  if [ -z "$_cnrt_end" ]; then
+    printf "%s" "$_cnrt_next"
+    return 0
+  fi
+  if [ "$(_math "$_cnrt_end" - "$_cnrt_create")" -gt 86400 ]; then
+    _cnrt_cap=$(_math "$_cnrt_end" - 86400)
+  else
+    _cnrt_cap=$(_math "$_cnrt_end" - 3600)
+  fi
+  if [ "$_cnrt_next" -gt "$_cnrt_cap" ]; then
+    _cnrt_next="$_cnrt_cap"
+  fi
+  printf "%s" "$_cnrt_next"
+}
+
+== which tags fetch renewalInfo (ARI) and their default --days
+3.0.7: renewalInfo refs=0 DEFAULT_RENEW=60
+3.1.0: renewalInfo refs=0 DEFAULT_RENEW=60
+3.1.2: renewalInfo refs=0 DEFAULT_RENEW=60
+3.1.3: renewalInfo refs=1 DEFAULT_RENEW="${DEFAULT_RENEW:-30}"
+3.1.4: renewalInfo refs=3 DEFAULT_RENEW="${DEFAULT_RENEW:-30}"
+3.1.5: renewalInfo refs=3 DEFAULT_RENEW="${DEFAULT_RENEW:-30}"
+3.1.6: renewalInfo refs=3 DEFAULT_RENEW="${DEFAULT_RENEW:-30}"

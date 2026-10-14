@@ -1,0 +1,20 @@
+ARI window as a share of the lifetime: 45-day 0.657 to 0.677, 90-day 0.657 to 0.677
+  projected 64-day window: day 42.0 to 43.3
+
+certbot 2.9.0 (Ubuntu 24.04 apt, no ARI): renewed between day 14.96 and 15.08 of 45, between day 59.79 and 60.21 of 90 -> 30 days before expiry
+  projected 64-day: day 34, 30 days before expiry
+certbot 5.8.0 (snap, ARI): first renewal seen at day 30.29 of 45 and 59.92 of 90, inside the ARI window
+  projected 64-day: inside the ARI window, day 42.0 to 43.3
+
+acme.sh 3.0.7 --days default: plans renewal on day 59.04 of a 90-day certificate
+  projected 64-day: day 59.0, 5.0 days before expiry
+acme.sh 3.0.7 --days 80: plans renewal on day 79.04 of a 90-day certificate
+  projected 64-day: day 79.0, 15.0 days AFTER expiry
+acme.sh 3.1.6 --days default (90-day): plans renewal on day 60.88 (ARI window)
+acme.sh 3.1.6 --days 80 (90-day): plans renewal on day 60.75 (ARI window)
+acme.sh 3.1.6 --days default (45-day): plans renewal on day 30.28 (ARI window)
+acme.sh 3.1.6 --days 60 (45-day): plans renewal on day 29.65 (ARI window)
+  projected 64-day: inside the ARI window, day 42.0 to 43.3
+
+lego 5.5.2: with and without ARI, renewal allowed in 29.96 days (45-day) and 59.96 days (90-day) after issue
+  projected 64-day: day 42.7 (two thirds of the lifetime)

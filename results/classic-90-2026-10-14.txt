@@ -1,0 +1,40 @@
+== classic-90 suite started 2026-10-14T21:25:18Z
+Saving debug log to /srv/le/classic-90/cb29/logs/letsencrypt.log
+This certificate expires on 2027-01-12.
+Saving debug log to /srv/le/classic-90/cb58/logs/letsencrypt.log
+This certificate expires on 2027-01-12.
+== acme.sh planned renewals
+acme307 a307n notBefore=Oct 14 20:27:17 2026 GMT notAfter=Jan 12 20:27:16 2027 GMT next='2026-12-12T21:25:56Z' days=
+acme307 a307n80 notBefore=Oct 14 20:27:38 2026 GMT notAfter=Jan 12 20:27:37 2027 GMT next='2027-01-01T21:26:13Z' days='80'
+acme316 a316n notBefore=Oct 14 20:27:56 2026 GMT notAfter=Jan 12 20:27:55 2027 GMT next='2026-12-14T17:34:48Z' days=
+acme316 a316n80 notBefore=Oct 14 20:28:13 2026 GMT notAfter=Jan 12 20:28:12 2027 GMT next='2026-12-14T14:23:16Z' days='80'
+== lego decision
+2026-10-14T21:27:01.056178047Z DEBUG RenewalInfo endpoint indicates that renewal is not needed. cert-name=legon.46-101-102-127.sslip.io
+2026-10-14T21:27:01.056598484Z INFO  Skip renewal: The certificate expires at 2027-01-12T20:28:26Z, the renewal can be performed in 59d23h1m25s276760362ns. cert-name=legon.46-101-102-127.sslip.io
+2026-10-14T21:27:01.097200078Z INFO  Skip renewal: The certificate expires at 2027-01-12T20:28:26Z, the renewal can be performed in 59d23h1m25s236158765ns. cert-name=legon.46-101-102-127.sslip.io
+== ARI windows
+{"cert": "c29n.46-101-102-127.sslip.io", "notBefore": "2026-10-14T20:26:55+00:00", "notAfter": "2027-01-12T20:26:54+00:00", "lifetime_days": 90.0, "ari_start": "2026-12-12T23:10:59+00:00", "ari_end": "2026-12-14T18:21:48+00:00", "ari_start_day": 59.11, "ari_end_day": 60.91, "ari_start_share": 0.657}
+{"cert": "c58n.46-101-102-127.sslip.io", "notBefore": "2026-10-14T20:27:03+00:00", "notAfter": "2027-01-12T20:27:02+00:00", "lifetime_days": 90.0, "ari_start": "2026-12-12T23:11:07+00:00", "ari_end": "2026-12-14T18:21:57+00:00", "ari_start_day": 59.11, "ari_end_day": 60.91, "ari_start_share": 0.657}
+{"cert": "legon.46-101-102-127.sslip.io.crt", "notBefore": "2026-10-14T20:28:27+00:00", "notAfter": "2027-01-12T20:28:26+00:00", "lifetime_days": 90.0, "ari_start": "2026-12-12T23:12:31+00:00", "ari_end": "2026-12-14T18:23:21+00:00", "ari_start_day": 59.11, "ari_end_day": 60.91, "ari_start_share": 0.657}
+{"cert": "a307n.46-101-102-127.sslip.io.cer", "notBefore": "2026-10-14T20:27:17+00:00", "notAfter": "2027-01-12T20:27:16+00:00", "lifetime_days": 90.0, "ari_start": "2026-12-12T23:11:22+00:00", "ari_end": "2026-12-14T18:22:12+00:00", "ari_start_day": 59.11, "ari_end_day": 60.91, "ari_start_share": 0.657}
+{"cert": "a307n80.46-101-102-127.sslip.io.cer", "notBefore": "2026-10-14T20:27:38+00:00", "notAfter": "2027-01-12T20:27:37+00:00", "lifetime_days": 90.0, "ari_start": "2026-12-12T23:11:43+00:00", "ari_end": "2026-12-14T18:22:32+00:00", "ari_start_day": 59.11, "ari_end_day": 60.91, "ari_start_share": 0.657}
+{"cert": "a316n.46-101-102-127.sslip.io.cer", "notBefore": "2026-10-14T20:27:56+00:00", "notAfter": "2027-01-12T20:27:55+00:00", "lifetime_days": 90.0, "ari_start": "2026-12-12T23:12:00+00:00", "ari_end": "2026-12-14T18:22:49+00:00", "ari_start_day": 59.11, "ari_end_day": 60.91, "ari_start_share": 0.657}
+{"cert": "a316n80.46-101-102-127.sslip.io.cer", "notBefore": "2026-10-14T20:28:13+00:00", "notAfter": "2027-01-12T20:28:12+00:00", "lifetime_days": 90.0, "ari_start": "2026-12-12T23:12:17+00:00", "ari_end": "2026-12-14T18:23:07+00:00", "ari_start_day": 59.11, "ari_end_day": 60.91, "ari_start_share": 0.657}
+== certbot 2.9 probe (hours after notBefore)
+# certbot 2.9.0 c29n.46-101-102-127.sslip.io notBefore=Oct 14 20:26:55 2026 GMT notAfter=Jan 12 20:26:54 2027 GMT
+hour 1420 (day 59.17, 2026-12-13 00:26:55 UTC): not due
+hour 1435 (day 59.79, 2026-12-13 15:26:55 UTC): not due
+hour 1445 (day 60.21, 2026-12-14 01:26:55 UTC): RENEWED
+hour 1460 (day 60.83, 2026-12-14 16:26:55 UTC): RENEWED
+== certbot 5.8 probe
+# certbot 5.8.0 c58n.46-101-102-127.sslip.io notBefore=Oct 14 20:27:03 2026 GMT notAfter=Jan 12 20:27:02 2027 GMT
+hour 1400 (day 58.33, 2026-12-12 04:27:03 UTC): not due
+hour 1415 (day 58.96, 2026-12-12 19:27:03 UTC): not due
+hour 1425 (day 59.38, 2026-12-13 05:27:03 UTC): not due
+hour 1432 (day 59.67, 2026-12-13 12:27:03 UTC): not due
+hour 1438 (day 59.92, 2026-12-13 18:27:03 UTC): RENEWED
+hour 1444 (day 60.17, 2026-12-14 00:27:03 UTC): not due
+hour 1450 (day 60.42, 2026-12-14 06:27:03 UTC): RENEWED
+hour 1460 (day 60.83, 2026-12-14 16:27:03 UTC): RENEWED
+hour 1475 (day 61.46, 2026-12-15 07:27:03 UTC): RENEWED
+== classic-90 suite done 2026-10-14T21:27:41Z
