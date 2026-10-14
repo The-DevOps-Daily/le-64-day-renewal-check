@@ -16,5 +16,5 @@ acme.sh 3.1.6 --days default (45-day): plans renewal on day 30.28 (ARI window)
 acme.sh 3.1.6 --days 60 (45-day): plans renewal on day 29.65 (ARI window)
   projected 64-day: inside the ARI window, day 42.0 to 43.3
 
-lego 5.5.2: with and without ARI, renewal allowed in 29.96 days (45-day) and 59.96 days (90-day) after issue
-  projected 64-day: day 42.7 (two thirds of the lifetime)
+lego 5.5.2, checked at issuance (ARI on, then --ari-disable): renewal allowed from day 30.00, 30.00 of 45 and 60.00, 60.00 of 90
+  share of the lifetime: 0.667; projected 64-day: day 42.7

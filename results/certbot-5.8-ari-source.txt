@@ -1,0 +1,202 @@
+# certbot 5.8.0 ARI renewal logic, from the PyPI wheels (pip download --no-deps certbot==5.8.0 acme==5.8.0)
+# b4b35b0e8377103f5a46f25e5aa8747eb6cd46889f43395de4d51d725e1eed71  certbot-5.8.0-py3-none-any.whl
+# 10c3fc75635eac4ba68e2709f3e899a6ea239772ffc84c08845f5d0af039d2ec  acme-5.8.0-py3-none-any.whl
+# The random-time block below is identical to the snap install (certbot 5.8.0) used on the test droplet.
+
+## acme/client.py, lines 307-371
+    def renewal_time(self, cert_pem: bytes
+        ) -> tuple[Optional[datetime.datetime], datetime.datetime]:
+        """Return an appropriate time to attempt renewal of the certificate,
+        and the next time to ask the ACME server for renewal info.
+
+        If the certificate has already expired, renewal info isn't checked.
+        Instead, the certificate's notAfter time is returned and the certificate
+        should be immediately renewed.
+
+        If the ACME directory has a "renewalInfo" field, the response will be
+        based on a fetch of the renewal info resource for the certificate
+        (https://www.ietf.org/archive/id/draft-ietf-acme-ari-08.html).
+
+        If there is no "renewalInfo" field, this function will return a tuple of
+        None, and the next time to ask the ACME server for renewal info.
+
+        This function may make other network calls in the future (e.g., OCSP
+        or CRL).
+
+        :param bytes cert_pem: cert as pem file
+
+        :returns: Tuple of time to attempt renewal, next time to ask for renewal info
+
+        :raises errors.ARIError: If an error occurs fetching ARI from the
+            server. Explicit exception chaining is used so the original error
+            can be accessed through the __cause__ attribute on the ARIError if
+            desired.
+
+        """
+        now = datetime.datetime.now()
+        # https://www.ietf.org/archive/id/draft-ietf-acme-ari-08.html#section-4.3.3
+        default_retry_after = datetime.timedelta(seconds=6 * 60 * 60)
+
+        cert = x509.load_pem_x509_certificate(cert_pem)
+
+        # from https://www.ietf.org/archive/id/draft-ietf-acme-ari-08.html#section-4.3, "Clients
+        # MUST NOT check a certificate's RenewalInfo after the certificate has expired."
+        #
+        # we call datetime.datetime.now here with the UTC argument to create a timezone aware
+        # datetime object that can be compared with the UTC notAfter from cryptography
+        if cert.not_valid_after_utc < datetime.datetime.now(datetime.timezone.utc):
+            return cert.not_valid_after_utc, now + default_retry_after
+
+        try:
+            renewal_info_base_url = self.directory['renewalInfo']
+        except KeyError:
+            return None, now + default_retry_after
+
+        ari_url = renewal_info_base_url + '/' + _renewal_info_path_component(cert)
+        try:
+            resp = self.net.get(ari_url, content_type='application/json')
+        except Exception as e:  # pylint: disable=broad-except
+            error_msg = f'failed to fetch renewal_info URL {ari_url}'
+            raise errors.ARIError(error_msg, now + default_retry_after) from e
+        renewal_info: messages.RenewalInfo = messages.RenewalInfo.from_json(resp.json())
+
+        start = renewal_info.suggested_window.start # pylint: disable=no-member
+        end = renewal_info.suggested_window.end # pylint: disable=no-member
+
+        delta_seconds = (end - start).total_seconds()
+        random_seconds = random.uniform(0, delta_seconds)
+        random_time = start + datetime.timedelta(seconds=random_seconds)
+
+        retry_after = self.retry_after(resp, default_retry_after.seconds)
+        return random_time, retry_after
+
+## certbot/_internal/renewal.py, lines 363-491
+def _ari_renewal_time(lineage: storage.RenewableCert,
+                     cert_pem: bytes,
+                     ari_clients: AriClientPool) -> Optional[datetime.datetime]:
+    """Return the ARI suggested renewal time if it's available."""
+    # For ARI requests, we want to use the ACME directory URL from which the
+    # cert was originally requested. Since `NamespaceConfig.server` can be overridden on
+    # the command line, we're using the server stored in the cert's renewal
+    # conf, i.e. `lineage.server`
+    #
+    # Fixes https://github.com/certbot/certbot/issues/10339
+    if not lineage.server:
+        logger.warning("Skipping ARI check because %s has no 'server' field. This issue will not "
+                       "prevent certificate renewal", lineage.configfile.filename)
+        return None
+
+    ari_config_section = lineage.configfile.get("acme_renewal_info", {})
+    retry_after = ari_config_section.get(ARI_RETRY_AFTER_CONFIG_ITEM, None)
+    if retry_after:
+        retry_after_datetime = datetime.datetime.fromisoformat(retry_after)
+        now = datetime.datetime.now()
+        if now < retry_after_datetime:
+            logger.debug("Skipped ACME Renewal Info check because ari_retry_after %s is in "
+                         "the future",
+                         retry_after)
+            return None
+
+    renewal_time = None
+    try:
+        ari_client = ari_clients.get(lineage.server)
+        renewal_time, retry_after = ari_client.renewal_time(cert_pem)
+    except Exception:  # pylint: disable=broad-except
+        # We want to stop errors around ARI preventing renewal so we catch all exceptions here
+        # with a warning asking users to tell us about any problems they are experiencing
+        logger.warning("An error occurred requesting ACME Renewal Information (ARI). If this "
+                       "problem persists and you think it's a bug in Certbot, please open an "
+                       "issue at https://github.com/certbot/certbot/issues/new/choose.")
+        logger.debug("Error while requesting ARI was:", exc_info=True)
+        retry_after = datetime.datetime.now() + datetime.timedelta(seconds=60 * 60 * 6)
+
+
+    config_update = configobj.ConfigObj()
+    config_update["acme_renewal_info"] = {
+        # Note: the ACME client returns naive (no timezone) datetimes for retry_after, and that
+        # is what we serialize here.
+        ARI_RETRY_AFTER_CONFIG_ITEM: retry_after.isoformat(timespec="seconds"),
+    }
+    storage.atomic_rewrite(lineage.configfile.filename, config_update)
+    return renewal_time
+
+
+def _default_renewal_time(cert_pem: bytes) -> datetime.datetime:
+    """Return an reasonable default time to attempt renewal of the certificate
+    based on the certificate lifetime.
+
+    :param bytes cert_pem: cert as pem file
+
+    :returns: Time to attempt renewal
+    :rtype: `datetime.datetime`
+    """
+    cert = x509.load_pem_x509_certificate(cert_pem)
+
+    not_before = cert.not_valid_before_utc
+    lifetime = cert.not_valid_after_utc - not_before
+    if lifetime.total_seconds() < 10 * 86400:
+        default_rt = not_before + lifetime / 2
+    else:
+        default_rt = not_before + lifetime * 2 / 3
+
+    return default_rt
+
+def should_autorenew(lineage: storage.RenewableCert,
+                     ari_clients: AriClientPool) -> bool:
+    """Should we now try to autorenew the most recent cert version?
+
+    If automatic renewal is disabled for the lineage, this function
+    immediately returns False.
+
+    Otherwise, if any of ACME Renewal Info (ARI), OCSP, or the
+    renew_before_expiry config option indicates we should renew, we
+    return True. If none of those values say we should renew and at
+    least one of ARI or renew_before_expiry has an available value, we
+    return False. We otherwise decide whether to renew based on the
+    certificate's remaining lifetime.
+
+    Note that this examines the numerically most recent cert version,
+    not the currently deployed version.
+
+    :returns: whether an attempt should now be made to autorenew the
+        most current cert version in this lineage
+    :rtype: bool
+
+    """
+    if not lineage.autorenewal_is_enabled():
+        return False
+
+    cert = lineage.version("cert", lineage.latest_common_version())
+    with open(cert, 'rb') as f:
+        cert_pem = f.read()
+
+    renewal_time = _ari_renewal_time(lineage, cert_pem, ari_clients)
+
+    now = datetime.datetime.now(datetime.timezone.utc)
+
+    if renewal_time and now > renewal_time:
+        return True
+
+    # Renewals on the basis of revocation
+    if lineage.ocsp_revoked(lineage.latest_common_version()):
+        logger.debug("Should renew, certificate is revoked.")
+        return True
+
+    # If the renew_before_expiry config field is set, check if it says we should renew
+    config_interval = lineage.configuration.get("renew_before_expiry")
+    if config_interval is not None:
+        notAfter = crypto_util.notAfter(cert)
+        if notAfter < storage.add_time_interval(now, config_interval):
+            logger.debug("Should renew, less than %s before certificate "
+                            "expiry %s.", config_interval,
+                            notAfter.strftime("%Y-%m-%d %H:%M:%S %Z"))
+            return True
+    # Only use the default if we don't have an ARI or renew_before_expiry value
+    elif renewal_time is None:
+        default_renewal_time = _default_renewal_time(cert_pem)
+        if now > default_renewal_time:
+            return True
+
+    return False
+
+

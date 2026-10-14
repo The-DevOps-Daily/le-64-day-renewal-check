@@ -1,0 +1,22 @@
+Certificate lifetime: 64.0 days (all 7 certificates)
+ARI window: measured day 42.04 to 43.32 (share 0.657 to 0.677); projected day 42.0 to 43.3
+
+certbot 2.9.0: measured not due at day 33.96, renewed at day 34.08; projected day 34
+certbot 5.8.0: each run draws a random time inside the window, so a run renews with
+  probability (now - start) / (end - start); measured probes:
+    day 41.25: not due (before the window)
+    day 41.67: not due (before the window)
+    day 41.92: not due (before the window)
+    day 42.08: not due (3% chance)
+    day 42.25: not due (16% chance)
+    day 42.50: RENEWED (36% chance)
+    day 42.92: not due (68% chance)
+  projected: inside the ARI window, day 42.0 to 43.3
+
+acme.sh 3.0.7 --days default: measured day 59.04, 4.96 days before expiry; projected day 59.0
+acme.sh 3.0.7 --days 80: measured day 79.04, 15.04 days AFTER expiry; projected day 79.0
+acme.sh 3.1.6 --days default: measured day 42.16 (window 42.04 to 43.32); projected inside the window
+acme.sh 3.1.6 --days 80: measured day 42.16 (window 42.04 to 43.32); projected inside the window
+  upgrade to 3.1.6 on the --days 80 lineage: day 79.04 -> day 42.23, Le_RenewalDays kept
+
+lego 5.5.2 (ARI on, then --ari-disable): measured renewal allowed from day 42.67, 42.67; projected day 42.7

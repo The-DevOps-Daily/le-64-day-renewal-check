@@ -1,0 +1,25 @@
+acme.sh source scan, upstream repo at 3.1.6-24-g3688b094, read 2026-10-14
+per tag: tag commit date | DEFAULT_RENEW line | _calc_next_renew_time refs (cap one day before expiry) | _get_ARI refs | _calc_ari_renew_time refs | _ari_pinned refs
+3.0.7 | 2023-10-05 | DEFAULT_RENEW=60 | 0 | 0 | 0 | 0
+3.1.0 | 2024-11-23 | DEFAULT_RENEW=60 | 0 | 0 | 0 | 0
+3.1.1 | 2025-04-23 | DEFAULT_RENEW=60 | 0 | 0 | 0 | 0
+3.1.2 | 2025-11-27 | DEFAULT_RENEW=60 | 0 | 0 | 0 | 0
+3.1.3 | 2026-04-28 | DEFAULT_RENEW="${DEFAULT_RENEW:-30}" | 0 | 1 | 0 | 0
+3.1.4 | 2026-07-17 | DEFAULT_RENEW="${DEFAULT_RENEW:-30}" | 3 | 3 | 0 | 0
+3.1.5 | 2026-09-19 | DEFAULT_RENEW="${DEFAULT_RENEW:-30}" | 3 | 3 | 4 | 8
+3.1.6 | 2026-09-20 | DEFAULT_RENEW="${DEFAULT_RENEW:-30}" | 3 | 3 | 4 | 8
+
+== 3.1.6: ARI check on every renewal run (acme.sh lines 6617-6629)
+  # ARI (RFC 9773): fetch the CA's suggestedWindow on every renewal check.
+  # If the window has started, renew now even if Le_NextRenewTime is in the future.
+  # Le_RenewalDays and Le_Valid_To are only in the domain conf when the user
+  # passed --days or --valid-to, so their presence is what pins the schedule.
+  # A pinned schedule still yields to a window that is EARLIER than it, so the
+  # CA can pull an urgent renewal forward. A fixed-date --valid-to opts out
+  # entirely: that cert is not renewed automatically at all.
+  # Set NO_ARI=1 (env, account.conf, or ca.conf) to opt out and use only
+  # Le_NextRenewTime for the renewal decision.
+  _ari_pinned=""
+  if [ "$Le_RenewalDays" ] || [ "$Le_Valid_To" ]; then
+    _ari_pinned="1"
+  fi

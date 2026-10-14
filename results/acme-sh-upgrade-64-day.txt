@@ -1,0 +1,15 @@
+== before: acme.sh 3.0.7 state
+Le_RenewalDays='80'
+Le_NextRenewTimeStr='2027-01-01T21:36:18Z'
+notAfter=Dec 17 20:37:42 2026 GMT
+== acme.sh 3.1.6 --renew on the same state (no --force), 2026-10-14T23:22:34Z
+[Wed Oct 14 23:22:34 UTC 2026] Renew: a307n80.46-101-102-127.sslip.io
+[Wed Oct 14 23:22:34 UTC 2026] Renewing: 'a307n80.46-101-102-127.sslip.io'
+[Wed Oct 14 23:22:34 UTC 2026] Renewing using Le_API=https://acme-staging-v02.api.letsencrypt.org/directory
+[Wed Oct 14 23:22:35 UTC 2026] Current renewal time: 2027-01-01T21:36:18Z
+[Wed Oct 14 23:22:35 UTC 2026] ARI suggestedWindow: 2026-11-25T21:36:11Z to 2026-11-27T04:18:13Z
+[Wed Oct 14 23:22:35 UTC 2026] Updating renewal time picked from ARI window: 2026-11-26T02:10:18Z
+[Wed Oct 14 23:22:35 UTC 2026] Skipping. Next renewal time is: 2026-11-26T02:10:18Z
+== after
+Le_RenewalDays='80'
+Le_NextRenewTimeStr='2026-11-26T02:10:18Z'
